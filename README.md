@@ -22,5 +22,8 @@ Source Code Compiled to upload to your waveshare ESP32 monitor
 new pnp board.zip
 Tunerstudio backup of the project fully working with a 1zz turbo tune running Subaru Injectors
 
+This was tuned on this RusEFI Firmware - firmware compilation changes daily - do not update if you want it to work!!
+https://github.com/rusefi/rusefi/releases/download/2026-02-20/rusefi_bundle_uaefi.zip
+
 Gerber_PnP-ECU2-Rev2_PCB_PnP-ECU2-Rev2.1_2026-10-17.zip
 Gerber to Make yourself a PCB with JLCPCB - make sure you spin the parts round the right way!
