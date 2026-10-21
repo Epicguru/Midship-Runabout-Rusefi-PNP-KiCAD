@@ -1,0 +1,54 @@
+(version 1)
+
+# JLCPCB fabrication limits for this board: 4 layers, 1.6 mm, 1 oz outer copper, no NPTH or slots.
+# Source: jlcpcb.com/capabilities/pcb-capabilities (read 2026-10-20). The via limits are the board-wide
+# minimums in Board Setup -> Constraints; the rules below add the stricter limits for plated pad holes.
+
+(rule "JLC PTH pad annular ring"
+	(constraint annular_width (min 0.15mm))
+	(condition "A.Type == 'Pad'"))
+
+(rule "JLC PTH pad hole to copper"
+	(constraint hole_clearance (min 0.28mm))
+	(condition "A.Type == 'Pad'"))
+
+(rule "JLC PTH pad hole to copper, inner layers"
+	(layer inner)
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Type == 'Pad'"))
+
+(rule "JLC pad hole to hole"
+	(constraint hole_to_hole (min 0.45mm))
+	(condition "A.Type == 'Pad' || B.Type == 'Pad'"))
+
+(rule "JLC max drill"
+	(constraint hole_size (max 6.3mm)))
+
+# The uaEFI headers (H*) sit in U1's holes, under the module, so they always overlap its courtyard.
+# U1's courtyard still guards everything else from sitting under the uaEFI.
+(rule "uaEFI headers inside U1 courtyard"
+	(constraint courtyard_clearance)
+	(condition "(A.Reference == 'U1' && B.Library_Link == 'MRR:PinHeader_*_uaEFI') || (B.Reference == 'U1' && A.Library_Link == 'MRR:PinHeader_*_uaEFI')")
+	(severity ignore))
+
+# H17 pin 14 (ESP32 GND) sits between +3V3 and ESP_D15 with the +3V3 track beside it, so B.Cu only
+# has room for one spoke. The pin also ties to GND on the other copper layers.
+(rule "H17 GND pin, one B.Cu spoke"
+	(layer B.Cu)
+	(constraint min_resolved_spokes 1)
+	(condition "A.memberOfFootprint('H17') && A.Pad_Number == '14'"))
+
+# The only bottom silkscreen is the MRR logo artwork. Vias and pads poke through it, and the fab
+# clips silk out of mask openings anyway, so its silk-to-mask and silk-to-silk checks are noise.
+(rule "MRR logo artwork on B.Silkscreen"
+	(constraint silk_clearance)
+	(condition "A.Type == 'Graphic' && A.Layer == 'B.Silkscreen'")
+	(severity ignore))
+
+# J1's non-GND pads have no inner-layer copper (remove_unused_layers), so the GND planes are cleared from
+# the bare hole. 0.4 mm gives margin over JLC's 0.3 mm inner minimum and still leaves ~0.4 mm of plane
+# between neighbouring pins at 2.5 mm pitch. Later rules take precedence over the 0.3 mm rule above.
+(rule "J1 pin hole to inner planes"
+	(layer inner)
+	(constraint hole_clearance (min 0.4mm))
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('J1')"))

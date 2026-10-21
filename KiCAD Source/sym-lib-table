@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "MRR")(type "KiCad")(uri "${KIPRJMOD}/MRR.kicad_sym")(options "")(descr "Custom symbols for the MRR PnP-ECU2 reconstruction"))
+)

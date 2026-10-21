@@ -1,0 +1,21 @@
+# KiCad backups / caches / lock files
+*-backups/
+*.kicad_prl
+*.lck
+~*.lck
+fp-info-cache
+_autosave-*
+*.bak
+\#auto_saved_files#
+# Generated outputs
+build/
+reports/*.rpt
+__pycache__/
+
+.history
+
+.history_trim
+
+jlcpcb/gerber/
+
+jlcpcb/production_files/

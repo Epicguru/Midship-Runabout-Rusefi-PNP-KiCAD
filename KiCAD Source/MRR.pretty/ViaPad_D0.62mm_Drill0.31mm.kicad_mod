@@ -1,0 +1,64 @@
+(footprint "ViaPad_D0.62mm_Drill0.31mm"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Exposed (untented) via used as a test/jumper point in the original EasyEDA design")
+	(property "Reference" "VP1"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "283c6b64-b5ed-4388-9546-b4cfcb9a411d")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "ViaPad"
+		(at 0 0 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "92a3dc37-9fed-406c-9998-c28193b47384")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "1908440d-86da-4189-a36e-764d6a50d862")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "cc170e55-2ee3-42c3-ae80-90c464ba149b")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr board_only exclude_from_pos_files exclude_from_bom)
+	(duplicate_pad_numbers_are_jumpers no)
+	(pad "1" thru_hole circle
+		(at 0 0)
+		(size 0.62 0.62)
+		(drill 0.31)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "c93df143-dce8-4ecd-baed-621c7fd6a72b")
+	)
+	(embedded_fonts no)
+)
