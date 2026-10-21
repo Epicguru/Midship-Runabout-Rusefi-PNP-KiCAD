@@ -4,7 +4,8 @@ https://github.com/threepotMR2/Midship-Runabout-Rusefi-PNP-pcb
 ## MRR Epicguru Fork
 This is a WIP KiCAD version of @threepotMR2 's Midship Runabout Rusefi project, which aims to be an affordable Plug & Play programmable ECU for the 1ZZFE or 2ZZ MR2 Spyder.  
 
-**[⬇ Download the latest production files (Gerbers, BOM, CPL)](https://github.com/Epicguru/Midship-Runabout-Rusefi-PNP-KiCAD/releases/latest)**: ready to upload to JLCPCB, generated automatically from the current PCB.
+**[Download the latest production files here (Gerbers, BOM, CPL)](https://github.com/Epicguru/Midship-Runabout-Rusefi-PNP-KiCAD/releases/latest)**  
+I do not recommend ordering this version of the board yet, it is untested.
 
 Compared to the original, this has been done in [KiCAD 10](https://www.kicad.org/), which is free open source schematic and PCB design software. If you also use the [JLCPCB Tools plugin](https://github.com/bouni/kicad-jlcpcb-tools) then you will get all parts ready to send for manufacturing with JLCPCB in one click (though pay attention to the rotation of components! I have not yet done the rotation corrections in the project, so you will need to do it when you upload the production files!).  
 
