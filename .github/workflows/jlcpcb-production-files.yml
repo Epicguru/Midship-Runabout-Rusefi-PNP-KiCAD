@@ -1,0 +1,136 @@
+# Exports JLCPCB production files (Gerber zip, BOM, CPL) with Bouni's
+# kicad-jlcpcb-tools plugin whenever the PCB changes on main, then publishes
+# them as a workflow artifact and as a GitHub Release anyone can download.
+#
+# The plugin version, its settings.json and its rotation/position corrections
+# are pinned to match the maintainer's local KiCad install. To change them,
+# update PLUGIN_* below and the files in CI/jlcpcb/.
+
+name: JLCPCB production files
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "KiCAD Source/*.kicad_pcb"
+      - "KiCAD Source/*.kicad_pro"
+      - "KiCAD Source/jlcpcb/project.db"
+      - "CI/jlcpcb/**"
+      - ".github/workflows/jlcpcb-production-files.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jlcpcb-production-files
+  cancel-in-progress: false
+
+env:
+  BOARD: KiCAD Source/MRR_PnP_ECU2.kicad_pcb
+  # Bouni/kicad-jlcpcb-tools release 2025.09.02, pinned by commit
+  PLUGIN_VERSION: "2025.09.02"
+  PLUGIN_COMMIT: 5b8defaec9f13777b544fd2336cccee17a0da8f0
+
+jobs:
+  export:
+    name: Export with JLCPCB plugin
+    runs-on: ubuntu-latest
+    container:
+      image: kicad/kicad:10.0.6
+      options: --user root
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      artifact: ${{ steps.names.outputs.artifact }}
+      kicad: ${{ steps.export.outputs.kicad }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download plugin ${{ env.PLUGIN_VERSION }}
+        run: |
+          python3 - <<'EOF'
+          import io, os, tarfile, urllib.request
+          sha = os.environ["PLUGIN_COMMIT"]
+          url = f"https://github.com/Bouni/kicad-jlcpcb-tools/archive/{sha}.tar.gz"
+          data = urllib.request.urlopen(url, timeout=60).read()
+          with tarfile.open(fileobj=io.BytesIO(data)) as tar:
+              if hasattr(tarfile, "data_filter"):
+                  tar.extractall("/opt", filter="data")
+              else:
+                  tar.extractall("/opt")
+          os.rename(f"/opt/kicad-jlcpcb-tools-{sha}", "/opt/jlcpcb-tools")
+          EOF
+          cat /opt/jlcpcb-tools/VERSION 2>/dev/null || true
+
+      - name: Apply local plugin setup
+        run: |
+          set -euo pipefail
+          plugin=/opt/jlcpcb-tools
+          # Local change in the maintainer's install: allow references up to 31
+          # characters (stock plugin drops footprints with references of 8+).
+          sed -i 's/len(fp.GetReference()) < 8:/len(fp.GetReference()) < 32:/' "$plugin/helpers.py"
+          grep -q 'len(fp.GetReference()) < 32:' "$plugin/helpers.py"
+          cp CI/jlcpcb/settings.json "$plugin/settings.json"
+          mkdir -p "$plugin/jlcpcb"
+          cp CI/jlcpcb/corrections.db CI/jlcpcb/mappings.db "$plugin/jlcpcb/"
+
+      - name: Generate production files
+        id: export
+        run: |
+          set -euo pipefail
+          echo "kicad=$(python3 -c 'import pcbnew; print(pcbnew.Version())')" >> "$GITHUB_OUTPUT"
+          python3 CI/jlcpcb/export_production_files.py /opt/jlcpcb-tools "$BOARD"
+
+      - name: Name artifact
+        id: names
+        run: echo "artifact=JLCPCB-production-files-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.names.outputs.artifact }}
+          path: |
+            KiCAD Source/jlcpcb/production_files/GERBER-*.zip
+            KiCAD Source/jlcpcb/production_files/BOM-*.csv
+            KiCAD Source/jlcpcb/production_files/CPL-*.csv
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: export
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.export.outputs.artifact }}
+          path: files
+
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          KICAD: ${{ needs.export.outputs.kicad }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          set -euo pipefail
+          short=${GITHUB_SHA::7}
+          tag="pcb-$(date -u +%Y-%m-%d)-${short}"
+          title="PCB production files ${short}"
+          subject=$(printf '%s\n' "${COMMIT_MSG:-Manual run}" | head -n1)
+          {
+            echo "JLCPCB production files for commit [\`${short}\`](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}): ${subject}"
+            echo
+            echo "- \`GERBER-*.zip\`: Gerbers and drill files, upload this to JLCPCB"
+            echo "- \`BOM-*.csv\`: bill of materials for PCB assembly"
+            echo "- \`CPL-*.csv\`: component placement list for PCB assembly"
+            echo
+            echo "Generated automatically with KiCad ${KICAD} and kicad-jlcpcb-tools ${PLUGIN_VERSION}."
+          } > notes.md
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release upload "$tag" files/* --clobber
+          else
+            gh release create "$tag" files/* --target "$GITHUB_SHA" --title "$title" --notes-file notes.md --latest
+          fi
