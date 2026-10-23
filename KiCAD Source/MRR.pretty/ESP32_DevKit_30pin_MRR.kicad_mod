@@ -370,4 +370,15 @@
 		(uuid "92a85a10-7c8a-40e5-bae2-db42dcc22eb4")
 	)
 	(embedded_fonts no)
+	(model "${KIPRJMOD}/3dmodels/ESP32_DevKit_V1_DOIT_30pin.stpZ"
+		(offset
+			(xyz 0 0 11)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
 )

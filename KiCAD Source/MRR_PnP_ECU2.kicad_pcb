@@ -4666,6 +4666,17 @@
 				(xyz 0 0 0)
 			)
 		)
+		(model "${KIPRJMOD}/3dmodels/ESP32_DevKit_V1_DOIT_30pin.stpZ"
+			(offset
+				(xyz 12.7 -17.78 11)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 180)
+			)
+		)
 	)
 	(footprint "Resistor_SMD:R_0603_1608Metric"
 		(layer "F.Cu")
@@ -10821,6 +10832,17 @@
 			(uuid "6ad9e266-ceec-4a21-ac51-b02284229f6e")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/3dmodels/TE_8-5353015-1.stpZ"
+			(offset
+				(xyz 0 -24.93 12.175)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz -90 0 0)
+			)
+		)
 	)
 	(footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
 		(layer "F.Cu")
@@ -21201,6 +21223,28 @@
 			(uuid "43214bb3-de61-482d-87b7-a5a31339d4b0")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/3dmodels/uaefi-e.wrz"
+			(offset
+				(xyz 49.743 -49.996 4.1)
+			)
+			(scale
+				(xyz 0.393701 0.393701 0.393701)
+			)
+			(rotate
+				(xyz 0 0 -90)
+			)
+		)
+		(model "${KIPRJMOD}/3dmodels/uaefi-e-frame-parts.stpZ"
+			(offset
+				(xyz 49.743 -49.996 2.5)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 -90)
+			)
+		)
 	)
 	(footprint "MRR:PinHeader_2x02_P2.54mm_uaEFI"
 		(layer "F.Cu")
